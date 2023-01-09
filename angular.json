@@ -94,8 +94,21 @@
             ],
             "scripts": []
           }
+        },
+        "deploy": {
+          "builder": "@angular/fire:deploy",
+          "options": {
+            "prerender": false,
+            "ssr": false,
+            "browserTarget": "lAngular:build:production",
+            "firebaseProject": "camera-af868",
+            "firebaseHostingSite": "langular"
+          }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "e38c742c-55e1-45ae-bf5a-0c12a0661a96"
   }
 }

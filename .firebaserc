@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "camera-af868": {
+      "hosting": {
+        "lAngular": [
+          "langular"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "camera-af868"
+  }
+}
