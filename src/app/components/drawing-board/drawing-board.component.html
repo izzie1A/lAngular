@@ -1,0 +1,27 @@
+<div class="gridContainer kmax mainColor">
+  <div class="gridBlock kmax" *ngFor="let x of gridArray">
+    {{x}}
+  </div>
+</div>
+
+
+<div class="gridContainer kmax mainColor">
+
+  <div class=" kmax" *ngFor="let x of whitePlayerPiece">
+    {{x}}
+  </div>
+  <div class=" kmax" *ngFor="let x of blackPlayerPiece">
+    {{x}}
+  </div>
+</div>
+<style>
+  .gridBlock {
+    aspect-ratio: 1/1;
+    background-color: red;
+  }
+
+  .gridContainer {
+    display: grid;
+    grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
+  }
+</style>
