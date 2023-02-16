@@ -1,27 +1,26 @@
-<div class="gridContainer kmax mainColor">
-  <div class="gridBlock kmax" *ngFor="let x of gridArray">
-    {{x}}
+<div  class="gridContainer kmax mainColor" >
+  <div class="gridBlock kmax" *ngFor="let x of gridArray" (click)="selectPiece(gridBlockID,x)" ngModel #gridBlockID >
+    {{x.value}}
   </div>
 </div>
 
-
-<div class="gridContainer kmax mainColor">
-
-  <div class=" kmax" *ngFor="let x of whitePlayerPiece">
-    {{x}}
-  </div>
-  <div class=" kmax" *ngFor="let x of blackPlayerPiece">
-    {{x}}
-  </div>
-</div>
 <style>
   .gridBlock {
     aspect-ratio: 1/1;
     background-color: red;
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 
   .gridContainer {
     display: grid;
     grid-template-columns: 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5% 12.5%;
+  }
+
+  .cdk-drag-placeholder {
+    opacity: 0;
+  }
+
+  .cdk-drag-animating {
+    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
   }
 </style>

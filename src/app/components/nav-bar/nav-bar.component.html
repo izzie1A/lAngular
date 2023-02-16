@@ -2,12 +2,12 @@
 
 
     <div class="mapPannel " cdkDrag>
-      <div class="mapPannelFirstChild" (click)="expanNavbar()">
+      <div class="mapPannelFirstChild" (click)="expanNavbar()" >
         <span class="material-symbols-outlined">menu</span>
       </div>
-      <div class="mapPannelList" [style.height]="navHeight">
-        <div cdkDropList class="gridCR kmax" (cdkDropListDropped)="drop($event)">
-          <div class="" *ngFor="let movie of navbarGidContainer" cdkDrag>
+      <div class="mapPannelList" [style.height]="navHeight" cdkDragHandle>
+        <div cdkDropList class="gridCR kmax">
+          <div class="" *ngFor="let movie of navbarGidContainer" >
             <div class="mapPannelChild">
               <span class="material-symbols-outlined">{{movie}}</span>
               <div>{{movie}}</div>
