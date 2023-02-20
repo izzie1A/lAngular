@@ -1,10 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { GridBoard } from '../drawing-board/chessClasses'
+import { GridMap } from '../drawing-board/gridBoard'
 interface hGrid {
   sizeX: number
   sizeY: number
 }
+interface gridBlock {
+  key: any
+  value: any
+}
+interface piece {
+  key: any
+  type: any
+  owner: any
+}
+
 
 @Component({
   selector: 'app-drawing-board',
@@ -22,78 +33,190 @@ export class DrawingBoardComponent implements OnInit {
   pieceElementSelector: any
   pieceDataSelector: any
 
+  gridBoardInjectHolder: any
   constructor() {
-    let testGrid: hGrid = { sizeX: this.boardSize, sizeY: this.boardSize };
-    this.gridArray = this.initializeGrid(testGrid)
+    this.gridBoardInjectHolder = new GridBoard({ sizeX: this.boardSize, sizeY: this.boardSize });
+    this.gridArray = this.gridBoardInjectHolder.gridArray;
 
-    this.whitePlayerPiece = this.initializePiece(2, 8)
-    this.placeChessOnGrid(this.whitePlayerPiece, 0, 1);
-
-    this.blackPlayerPiece = this.initializePiece(2, 8).reverse();
-    this.placeChessOnGrid(this.blackPlayerPiece, 48, 1);
-
-  }
-
-  initializeGrid(testGrid: hGrid) {
-    let outputGridArray: any = []
-    for (let i = 0; i < testGrid.sizeY; i++) {
-      for (let j = 0; j < testGrid.sizeX; j++) {
-        outputGridArray[outputGridArray.length] = { key: i * this.boardSize + j, value: '' };
-      }
-    }
-    return outputGridArray
-  }
-
-  initializePiece(sizeX: number, sizeY: number) {
-    let outputGridArray: any = [];
-    for (let i = 0; i < sizeX * sizeY; i++) {
-      outputGridArray[i] = this.pieceOrder[i];
-    }
-    return outputGridArray
-  }
-
-
-  placeChessOnGrid(targetChessArray: string[], from: any, direction: number) {
-    let targetChessArrayCount = 0;
-    for (let i = 0; i < targetChessArray.length; i = i + direction) {
-      // this.gridArray[from+i] = targetChessArray[targetChessArrayCount];
-      this.gridArray[from + i] = { key: from + i, value: targetChessArray[targetChessArrayCount] };
-      targetChessArrayCount++
-    }
+    let testY : GridMap = new GridMap({ sizeX: this.boardSize, sizeY: this.boardSize });
   }
 
   selectPiece(selectElement: any, selectData: any) {
-    if (selectElement == this.pieceElementSelector) {
-      this.pieceElementSelector.style.backgroundColor = '#FF0000';
-      this.pieceElementSelector = undefined;
-      this.pieceDataSelector = undefined;
-    }
-    else if (this.pieceElementSelector == undefined) {
-      selectElement.style.backgroundColor = '#FFFFFF';
-      this.pieceElementSelector = selectElement;
-      this.pieceDataSelector = selectData;
-    }
-    else {
-      this.moveChessPiece(this.gridArray[this.pieceDataSelector.key], this.gridArray[selectData.key]);
-      this.pieceElementSelector.style.backgroundColor = '#FF0000';
-      this.pieceElementSelector = undefined;
-      this.pieceDataSelector = undefined;
-    }
-  }
-  moveChessPiece(from: any, to: any) {
-    this.checkValidMove() ? this.swapping(from,to) : alert('falsMove');
+    this.gridBoardInjectHolder.interactBoard(selectElement, selectData);
   }
   
-  swapping(from: any, to: any) {
-    let pieceDataHolder = this.gridArray[to.key];
-    this.gridArray[to.key] = this.gridArray[from.key];
-    this.gridArray[from.key] = pieceDataHolder;
-  }
+  // moveChessPiece(from: any, to: any) {
+  //   this.checkValidMove({ key: '', type: 'q', owner: 'white' }, { key: 0, value: '' }) ? this.swapping(from, to) : alert('falsMove');
+  // }
 
-  checkValidMove() {
-    return true
-  }
+  // swapping(from: any, to: any) {
+  //   [this.gridArray[to.key].value, this.gridArray[from.key].value] = [this.gridArray[from.key].value, this.gridArray[to.key].value];
+  // }
 
+  // checkValidMove(pieceType: piece, from: gridBlock) {
+  //   return true
+  // }
+
+  // getPossibleMove(pieceType: piece) {
+  //   console.log(pieceType);
+  //   var outputArr: number[] = new Array()
+
+  //   switch (pieceType.toString()) {
+  //     case 'k':
+  //       outputArr = this.simSort(outputArr.concat(
+  //         this.forward(2),
+  //         this.back(2),
+  //         this.left(2),
+  //         this.right(2),
+  //         this.diagnalForwardRight(2),
+  //         this.diagnalForwardLeft(2),
+  //         this.diagnalBackdRight(2),
+  //         this.diagnalBackLeft(2)))
+  //       break;
+  //     case 'q':
+  //       outputArr = this.simSort(outputArr.concat(
+  //         this.forward(8),
+  //         this.back(8),
+  //         this.left(8),
+  //         this.right(8),
+  //         this.diagnalForwardRight(8),
+  //         this.diagnalForwardLeft(8),
+  //         this.diagnalBackdRight(8),
+  //         this.diagnalBackLeft(8)))
+  //       break;
+  //     // statement 2
+  //     case 'r':
+  //       outputArr = this.simSort(outputArr.concat(
+  //         this.forward(8),
+  //         this.back(8),
+  //         this.left(8),
+  //         this.right(8)))
+  //       break;
+  //       // statement N
+  //       break;
+  //     case 'b':
+  //       outputArr = this.simSort(outputArr.concat(
+  //         this.diagnalForwardRight(8),
+  //         this.diagnalForwardLeft(8),
+  //         this.diagnalBackdRight(8),
+  //         this.diagnalBackLeft(8)))
+  //       // statement N
+  //       break;
+  //     case 'n':
+  //       // outputArr = this.simSort(outputArr.concat(
+  //       //   this.knight(8)))
+  //       outputArr = this.knight(8)
+  //       // statement N
+  //       break;
+  //     default:
+  //       // 
+  //       break;
+  //   }
+  //   console.log(outputArr)
+  //   return outputArr;
+  // }
+
+  // showPossibleMove(input: any[]) {
+  //   for (let i = 0; i < input.length ; i++) {
+  //     // input[i].style.backgroundColor = '#00FF00';
+  //     console.log(input[i])
+  //     let tAns = document.getElementById(input[i]);
+  //     tAns!! ? console.log(tAns.style.backgroundColor = '#00FF00') : 0
+  //   }
+  //   return input
+  // }
+
+  // forward(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //     outputArr[i] = i * this.boardSize;
+  //   }
+  //   return outputArr
+  // }
+  // back(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //     outputArr[i] = -i * this.boardSize;
+  //   }
+  //   return outputArr
+  // }
+  // left(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //     outputArr[i] = -i;
+  //   }
+  //   return outputArr
+  // }
+  // right(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //     outputArr[i] = i;
+  //   }
+  //   return outputArr
+  // }
+  // diagnalForwardRight(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //     outputArr[i] = i * this.boardSize + i;
+  //   }
+  //   return outputArr
+  // }
+  // diagnalForwardLeft(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //     outputArr[i] = i * this.boardSize - i;
+  //   }
+  //   return outputArr
+  // }
+  // diagnalBackdRight(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //     outputArr[i] = -i * this.boardSize + i;
+  //   }
+  //   return outputArr
+  // }
+  // diagnalBackLeft(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 0; i < inputlength; i++) {
+  //   }
+  //   return outputArr
+  // }
+
+  // knight(inputlength: number) {
+  //   var outputArr: number[] = new Array(inputlength)
+  //   for (let i = 1; i < 2; i++) {
+  //     console.log(i)
+  //     // left forward
+  //     outputArr[0] = i * this.boardSize + (i + 1);
+  //     outputArr[1] = (i + 1) * this.boardSize + i;
+  //     // right backward
+  //     outputArr[2] = -i * this.boardSize + (-i - 1);
+  //     outputArr[3] = (-i - 1) * this.boardSize - i;
+  //     // left forward
+  //     outputArr[4] = i * this.boardSize - i - 1;
+  //     outputArr[5] = (i + 1) * this.boardSize - i;
+  //     // right forward
+  //     outputArr[6] = -i * this.boardSize - (-i - 1);
+  //     outputArr[7] = (-i - 1) * this.boardSize + i;
+  //   }
+  //   return outputArr;
+  // }
+
+  // simSort(input: any[]) {
+  //   for (let i = 0; i < input.length; i++) {
+  //     for (let j = 0; j < input.length; j++) {
+  //       input[i] > input[j] ? [input[i], input[j]] = [input[j], input[i]] : false
+  //     }
+  //   }
+  //   return input
+  // }
+
+  // deleteduplicate(input: any[]) {
+  //   for (let i = 0; i < input.length; i++) {
+  //     input[i] == input[i + 1] ? input.splice(i, 1) : 0
+  //   }
+  //   return input
+  // }
   ngOnInit() { }
 
 }

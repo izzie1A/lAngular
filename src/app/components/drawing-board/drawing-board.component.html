@@ -1,5 +1,6 @@
 <div  class="gridContainer kmax mainColor" >
-  <div class="gridBlock kmax" *ngFor="let x of gridArray" (click)="selectPiece(gridBlockID,x)" ngModel #gridBlockID >
+  <div class="gridBlock kmax" id="{{x.key}}" *ngFor="let x of gridArray" (click)="selectPiece(gridBlockID,x)" ngModel #gridBlockID >
+    {{x.key}}
     {{x.value}}
   </div>
 </div>
