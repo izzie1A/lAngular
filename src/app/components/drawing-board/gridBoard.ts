@@ -1,3 +1,5 @@
+import { fromEventPattern } from "rxjs";
+
 export class GridMap {
     boardSize = 8;
     gridContainer: any = []
@@ -9,8 +11,11 @@ export class GridMap {
     blackPlayerPiece: any = []
     chessPieceOrderArray = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'];
 
-    pieceElementSelector: any
-    pieceDataSelector: any
+    selector: any | undefined = undefined;
+    pieceActionArray:any[] = [];
+    // pieceElementSelector: any
+    // pieceDataSelector: any
+
 
     constructor(boardSize: hGrid) {
         this.gridMap = new Map<string, any[]>();
@@ -19,97 +24,139 @@ export class GridMap {
         let testGrid: hGrid = { sizeX: this.boardSize, sizeY: this.boardSize };
         boardSize!! ? this.gridContainer = this.initializeGrid(boardSize) : this.gridContainer = this.initializeGrid(testGrid)
 
-        this.placeChessOnGrid(this.chessPieceOrderArray, this.gridContainer.gridMap, 0, 1)
-        this.placeChessOnGrid(this.chessPieceOrderArray.reverse(), this.gridContainer.gridMap, 48, 1)
+        this.whitePlayerPiece = this.placeChessOnGrid(this.chessPieceOrderArray, this.gridContainer.gridMap, 0, 1, 'black')
+        this.blackPlayerPiece = this.placeChessOnGrid(this.chessPieceOrderArray.reverse(), this.gridContainer.gridMap, 48, 1, 'white')
 
-
-        
-        let y = new King('me');
-        y.getAvailableMoves()
-        console.log(y.movement);
-        console.log(y.getAvailableMoves());
-        let yArray =y.getAvailableMovesIndex(8,60);
-        console.log(yArray);
-        
-        // do later
-        let x = this.select('2')
-
-        // testPrinting
         this.tPrintGrid();
-
     }
 
+    // initialize
     initializeGrid(testGrid: hGrid) {
         let gridArray: any = []
-        let gridMap = new Map<string, any[]>();
+        let gridMap = new Map<string, any>();
         for (let i = 0; i < testGrid.sizeY; i++) {
             for (let j = 0; j < testGrid.sizeX; j++) {
-                gridMap.set((i * this.boardSize + j).toString(), ['e']);
-                gridArray[gridArray.length] = { key: i * this.boardSize + j, value: '' };
+                // gridMap.set((i * this.boardSize + j).toString(), 'e');
+                gridMap.set((i * this.boardSize + j).toString(), { pieceValue: 'e', owner: 'to' });
+                gridArray[gridArray.length] = { key: i * this.boardSize + j, value: '', owner: 'to' };
             }
         }
+        this.gridMap = gridMap;
+        this.gridArray = gridArray;
         return { gridMap: gridMap, gridArray: gridArray }
     }
-    placeChessOnGrid(targetChessArray: string[], targetGrid: any, from: any, direction: number) {
+    getMapToArray(ipnutMap: Map<string, any[]>, inputArray: any[]) {
+        let outputArray = inputArray;
+        for (const [key, value] of ipnutMap) {
+            let i = parseInt(key, 10);
+            outputArray[i] = { key: i, value: value };
+        }
+        return outputArray
+    }
+
+    placeChessOnGrid(targetChessArray: string[], targetGrid: any, from: any, direction: number, owner?: string) {
         for (let i = 0; i < targetChessArray.length; i = i + 1) {
-            targetGrid.set((i + (from * direction)).toString(), [targetChessArray[i]]);
+            // targetGrid.set((i + (from * direction)).toString(), [targetChessArray[i]]);
+            targetGrid.set((i + (from * direction)).toString(), { pieceValue: targetChessArray[i], owner: owner });
         }
         return targetGrid
     }
 
-    select(key: string) {
-        return this.gridContainer.gridMap.get(key);
-    }
 
-    getPossiableove() {
-    }
+    // control
 
-    validateMove() {
-    }
+    action(fromSelector: any, toSelector: any) {
+        let holder = fromSelector;
+        let isFirendly = this.isFriendly(fromSelector, toSelector);
 
-    move() {
-    }
-
-    tPrintGrid() {
-        let printSring: string = '';
-        let i = 0;
-        for (const [key, value] of this.gridContainer.gridMap) {
-            if (i == 7) {
-                printSring = printSring.concat(value)
-                console.log(printSring)
-                printSring = ''
-                i = 0
-            } else {
-                printSring = printSring.concat(value)
-                i++
-            }
+        if (isFirendly == false) {
+            //attack 
+            console.log('attack', )
+            this.gridContainer.gridMap.set(fromSelector.selectData.key.toString(), { pieceValue: 'e', owner: '' });
+            this.gridContainer.gridMap.set(toSelector.selectData.key.toString(), { pieceValue: holder.selectData.value.pieceValue, owner: holder.selectData.value.owner });
+        } else if (isFirendly == true) {
         }
     }
-}
 
+    isFriendly(fromSelector: any, toSelector: any) {
+        return fromSelector.selectData.value.owner == toSelector.selectData.value.owner;
+    }
 
-interface hGrid {
-    sizeX: number
-    sizeY: number
-}
-interface gridBlock {
-    key: any
-    value: any
-}
+    getPieceMoves(inputString: string, pieceData: any) {
+        let trssformer: any = 0;
+        switch (inputString) {
+            case 'k':
+                trssformer = new King();
+                break;
+            case 'q':
+                trssformer = new Queen();
+                break;
+            case 'b':
+                trssformer = new Biship();
+                break;
+            case 'n':
+                trssformer = new Knight();
+                break;
+            case 'r':
+                trssformer = new Rook();
+                break;
+            case 'p':
+                trssformer = new Pawn();
+                break;
+            default:
+                console.warn('unfound piece type');
+                break;
+        }
+        trssformer.setMaxMovesLimit(this.boardSize, pieceData.key);
+        let x = trssformer.getAvailableMoves();
+        // temp bPlayerFlip flip
+        if (pieceData.value.owner == 'white' && inputString == 'p') {
+            for (let i = 0; i < x.length; i++) {
+                x[i] = -x[i];
+            }
+        }
 
-interface Piece {
-    name: any
-    type: any
-    owner?: any
-}
-interface rtChessPiece {
-    name: any
-    type: string
-    owner?: any
-    health?: any
-    status?: any
-    movement: any
-}
+        return x;
+    }
+
+    // valid control
+    checkValidMove(fromSelector: any, toSelector: any) {
+        let attackable = fromSelector.selectData.value.owner != toSelector.selectData.value.owner;
+        let ValiMoveArray = this.getPieceMoves(fromSelector.selectData.value.pieceValue, fromSelector.selectData)
+        // this.gridContainer.gridMap.get(fromSelector.selectData.key.toString());
+
+        let inRange = false;
+        for( let loopItem of ValiMoveArray){
+            // console.log(loopItem+fromSelector.selectData.key == toSelector.selectData.key);
+            // console.log('loopItem+',);
+            // console.log('loopItem',loopItem,'key',toSelector.selectData.key);
+            if(loopItem+fromSelector.selectData.key == toSelector.selectData.key){
+                inRange = true
+                break;
+            }
+        }
+        
+        // console.log('inRange',inRange,'attackable',attackable);
+        inRange!! && attackable!! ? this.pieceMoveTo(fromSelector,toSelector, attackable):console.warn('invalidMove');
+        return inRange ? attackable : inRange
+    }
+
+    pieceMoveTo(fromSelector: any, toSelector: any, isValid:boolean){
+            // change map&array
+            this.gridContainer.gridMap.set(fromSelector.selectData.key.toString(), { pieceValue: 'e', owner: '' });
+            this.gridContainer.gridMap.set(toSelector.selectData.key.toString(), { pieceValue: fromSelector.selectData.value.pieceValue, owner: fromSelector.selectData.value.owner });
+            for (const [key, value] of this.gridContainer.gridMap) {
+                let i = parseInt(key, 10);
+                this.gridContainer.gridArray[i] = { key: i, value: value };
+            }
+            this.pieceActionQuery({fromSelector:fromSelector,toSelector:toSelector})
+    }
+
+    pieceActionQuery(input:any){
+        this.pieceActionArray[this.pieceActionArray.length]=input;
+        console.log(this.pieceActionArray)
+    }
+
 
 export class ChessPiece implements rtChessPiece {
     name: any;
@@ -129,15 +176,11 @@ export class ChessPiece implements rtChessPiece {
         diagnalBackLeft: 0,
     }
 
-    constructor(owner: string) {
+    constructor() {
         this.name = 'defaultName';
         this.type = 'defaultType';
-        this.owner = owner;
         this.initializeMovement();
         // this.getAvailableMoves();
-    }
-    getMovement() {
-        return this.movement
     }
 
     initializeMovement() {
@@ -153,7 +196,7 @@ export class ChessPiece implements rtChessPiece {
         }
     }
 
-    getAvailableMoves() {
+    getAvailableMoves(gridLength: number, position: number) {
         var outputArr: number[] = new Array()
         // forward
         for (let i = 0; i < this.movement.forward; i++) {
@@ -190,17 +233,42 @@ export class ChessPiece implements rtChessPiece {
         return outputArr
     }
 
-    getAvailableMovesIndex(gridLength:number,position:number){
-        console.log(position)
-        console.log(gridLength)
-        console.log('left')
-        console.log(position%gridLength == 0 ? true: false)
-        console.log('right')
-        console.log(position%(gridLength-1) == 0 ? true: false)
-        console.log('top')
-        console.log(0<position && position<gridLength  ? true: false)
-        console.log('down')
-        console.log(((gridLength*gridLength)-gridLength)<position && position<(gridLength*gridLength)  ? true: false)
+    get2DCoordinate(gridLength: number, position: number) {
+        return { x: (position % gridLength), y: Math.floor((position / gridLength)) }
+    }
+    setMaxMovesLimit(gridLength: number, position: number) {
+        let limit = this.get2DCoordinate(gridLength, position);
+        // console.warn(limit)
+
+        let forwardLimit = (gridLength - limit.y - 1);
+        let backLimit = (limit.y);
+        let rightLimit = (gridLength - limit.x - 1);
+        let leftLimit = (limit.x);
+        // console.warn(
+        //     'forwardLimit', forwardLimit,
+        //     'backLimit', backLimit,
+        //     'rightLimit', leftLimit,
+        //     'leftLimit', rightLimit,
+        // )
+
+        this.movement.forward > forwardLimit ? this.movement.forward = forwardLimit : 0
+        this.movement.back > backLimit ? this.movement.back = backLimit : 0;
+
+        this.movement.left > rightLimit ? this.movement.left = leftLimit : 0;
+        this.movement.right > leftLimit ? this.movement.right = rightLimit : 0;
+
+        this.movement.diagnalForwardRight > forwardLimit ? this.movement.diagnalForwardRight = forwardLimit : 0;
+        this.movement.diagnalForwardRight > rightLimit ? this.movement.diagnalForwardRight = rightLimit : 0;
+
+        this.movement.diagnalForwardLeft > forwardLimit ? this.movement.diagnalForwardLeft = forwardLimit : 0;
+        this.movement.diagnalForwardLeft > leftLimit ? this.movement.diagnalForwardLeft = leftLimit : 0;
+
+        this.movement.diagnalBackdRight > backLimit ? this.movement.diagnalBackdRight = backLimit : 0;
+        this.movement.diagnalBackdRight > rightLimit ? this.movement.diagnalBackdRight = rightLimit : 0;
+
+        this.movement.diagnalBackLeft > backLimit ? this.movement.diagnalBackLeft = backLimit : 0;
+        this.movement.diagnalBackLeft > leftLimit ? this.movement.diagnalBackLeft = leftLimit : 0;
+        // let x = this.getAvailableMoves();
 
     }
 
@@ -210,17 +278,13 @@ export class Pawn extends ChessPiece {
     reachBottom: boolean;
     attackable: boolean;
 
-    constructor(owner: string) {
-        super(owner);
+    constructor() {
+        super();
         this.name = 'pawn';
         this.type = 'p';
         this.firstMove = true
         this.reachBottom = false
         this.attackable = false
-        console.log(this.firstMove)
-        
-        // let x = this.getAvailableMoves();
-        // console.log(x)
     }
 
     override initializeMovement() {
@@ -231,7 +295,6 @@ export class Pawn extends ChessPiece {
     isSpecialMoveAvailable(inputGridMap?: Map<string, any[]>, position?: number) {
         this.firstMove ? console.log('mewo') : 0;
         this.firstMove ? this.movement.forward = 2 : this.movement.forward = 1;
-        console.log(this.movement.forward)
         this.reachBottom ? this.henChin() : 0;
         if (this.attackable!!) {
             this.movement.diagnalForwardRight = 1
@@ -244,7 +307,6 @@ export class Pawn extends ChessPiece {
     }
 
 }
-
 
 // mass
 
@@ -265,7 +327,6 @@ export class King extends ChessPiece {
 
 
 }
-
 
 export class Queen extends ChessPiece {
     rookSwapAvailable = false;
@@ -296,6 +357,20 @@ export class Biship extends ChessPiece {
     }
 
 }
+
+export class Rook extends ChessPiece {
+    rookSwapAvailable = false;
+    checkmate = false;
+
+    override initializeMovement() {
+        this.movement.forward = this.maxMovementLength
+        this.movement.back = this.maxMovementLength
+        this.movement.left = this.maxMovementLength
+        this.movement.right = this.maxMovementLength
+    }
+
+}
+
 export class Knight extends ChessPiece {
     rookSwapAvailable = false;
     checkmate = false;
@@ -303,7 +378,6 @@ export class Knight extends ChessPiece {
     setMovement() {
         var outputArr: number[] = new Array()
         for (let i = 1; i < 2; i++) {
-            console.log(i)
             // left forward
             outputArr[0] = i * this.maxMovementLength + (i + 1);
             outputArr[1] = (i + 1) * this.maxMovementLength + i;
@@ -318,18 +392,6 @@ export class Knight extends ChessPiece {
             outputArr[7] = (-i - 1) * this.maxMovementLength + i;
         }
         return outputArr;
-    }
-
-}
-export class Rook extends ChessPiece {
-    rookSwapAvailable = false;
-    checkmate = false;
-
-    override initializeMovement() {
-        this.movement.forward = this.maxMovementLength
-        this.movement.back = this.maxMovementLength
-        this.movement.left = this.maxMovementLength
-        this.movement.right = this.maxMovementLength
     }
 
 }

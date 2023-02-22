@@ -2,20 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { GridBoard } from '../drawing-board/chessClasses'
 import { GridMap } from '../drawing-board/gridBoard'
-interface hGrid {
-  sizeX: number
-  sizeY: number
-}
-interface gridBlock {
-  key: any
-  value: any
-}
-interface piece {
-  key: any
-  type: any
-  owner: any
-}
-
+import { gridController } from '../drawing-board/gridController'
 
 @Component({
   selector: 'app-drawing-board',
@@ -27,24 +14,148 @@ export class DrawingBoardComponent implements OnInit {
   gridArray: any = []
   whitePlayerPiece: any = []
   blackPlayerPiece: any = []
-  pieceOrder = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'];
-  pawnPieceOrder = ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'];
 
-  pieceElementSelector: any
-  pieceDataSelector: any
+  selector: any | undefined = undefined;
+  timeLeft: number = 10;
+  interval: any;
+
+  // action
+  commandArray:any[] =[]
+
+  // displayArray : any[];
+  displayArray: {
+    availableSpecialMoveArray: any[];
+    availableMovesArray: any[];
+    availableAttackArray: any[];
+  };
+
 
   gridBoardInjectHolder: any
+
   constructor() {
-    this.gridBoardInjectHolder = new GridBoard({ sizeX: this.boardSize, sizeY: this.boardSize });
-    this.gridArray = this.gridBoardInjectHolder.gridArray;
+    this.displayArray = { availableSpecialMoveArray: [], availableMovesArray: [], availableAttackArray: [] };
+    this.gridBoardInjectHolder = new GridMap({ sizeX: this.boardSize, sizeY: this.boardSize });
+    let gridBoaradInjectHolder = new gridController(this.boardSize, this.boardSize);
 
-    let testY : GridMap = new GridMap({ sizeX: this.boardSize, sizeY: this.boardSize });
+    // let testY: GridBoard = new GridBoard({ sizeX: this.boardSize, sizeY: this.boardSize });
+    this.gridArray = this.gridBoardInjectHolder.getMapToArray(this.gridBoardInjectHolder.gridContainer.gridMap, this.gridBoardInjectHolder.gridContainer.gridArray);
+    this.startTimer()
   }
 
-  selectPiece(selectElement: any, selectData: any) {
-    this.gridBoardInjectHolder.interactBoard(selectElement, selectData);
+
+  onSelect(selectElement: any, selectData: any) {
+
+    if (this.selector == undefined) {
+      console.log('select', selectElement, selectData)
+      this.selector = { element: selectElement, selectData: selectData }
+      let availableMoveHolder = this.gridBoardInjectHolder.getPieceMoves(selectData.value.pieceValue, selectData);
+      this.loadAvailableMoves(availableMoveHolder, selectData.key)
+      this.showPossibleMove(true, this.displayArray.availableMovesArray);
+    }
+    else if (this.selector != undefined) {
+      if (this.selector.element == selectElement && this.selector.selectData == selectData) {
+        console.log('deselect', this.selector.element == selectElement && this.selector.selectData == selectData)
+        this.selector = undefined;
+        this.showPossibleMove(false, this.displayArray.availableMovesArray);
+        this.displayArray.availableMovesArray = []
+
+      } else {
+        console.log('active')
+        let result = this.gridBoardInjectHolder.checkValidMove(this.selector, { element: selectElement, selectData: selectData });
+        this.showPossibleMove(false, this.displayArray.availableMovesArray);
+        this.selector = undefined;
+      }
+    }
+    return
   }
-  
+
+  loadAvailableMoves(input: any[], positionIndex: number) {
+    for (let i = 0; i < input.length; i++) {
+      this.displayArray.availableMovesArray[i] = input[i] + positionIndex;
+    }
+  }
+
+  showPossibleMove(boo: boolean, inputArray: any[]) {
+    for (let i = 0; i < inputArray.length; i++) {
+      let tAns: HTMLElement | null = document.getElementById(inputArray[i]);
+      if (boo == true) {
+        tAns?.setAttribute("style", "background-color : #00FFFF; border: 1px solid blue;");
+      } else if (boo == false) {
+        tAns?.setAttribute("style", "background-color : #FF0000; border: none;");
+      }
+    }
+  }
+
+
+  startTimer() {
+    this.interval = setInterval(() => {
+      this.commandArray = this.gridBoardInjectHolder.pieceActionArray
+      if (this.timeLeft > 0) {
+        let tAns: HTMLElement | null = document.getElementById('timer');
+        let ratio = 255;
+        let colorHex = (ratio*this.timeLeft).toString(16);
+        colorHex = (ratio*this.timeLeft).toString(16);
+        console.log(colorHex) 
+        tAns?.setAttribute("style", "background-color : #"+colorHex+"; border: 1px solid blue;");
+        this.timeLeft--;
+
+      } else {
+        this.timeLeft = 10 ;
+      }
+
+      if(this.timeLeft == 1){
+        console.log(this.commandArray)
+        this.commandArray.splice(this.commandArray.length-1,1);
+        console.log(this.commandArray)
+      }else{
+        console.log(this.timeLeft%10)
+      }
+    }, 1000)
+  }
+
+  pauseTimer() {
+    clearInterval(this.interval);
+  }
+  t() {
+    let x = '#FF0000';
+    let y = '#0000FF';
+    let z = '#00FF00';
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // action(fromSelector: any, toSelector: any) {
+  //   let isFirendly = fromSelector.selectData.value.owner == toSelector.selectData.value.owne;
+
+  //   if (isFirendly == false) {
+  //     //attack 
+  //     console.log('isFirendly', isFirendly)
+  //     this.gridBoardInjectHolder.gridContainer.gridMap.set(fromSelector.selectData.key.toString(), { pieceValue: 'e', owner: '' });
+  //     this.gridBoardInjectHolder.gridContainer.gridMap.set(toSelector.selectData.key.toString(), { pieceValue: fromSelector.selectData.value.pieceValue, owner: fromSelector.selectData.value.owner });
+  //     // this.gridArray = this.gridBoardInjectHolder.gridContainer.gridArray
+  //     for (const [key, value] of this.gridBoardInjectHolder.gridContainer.gridMap) {
+  //       let i = parseInt(key, 10);
+  //       this.gridBoardInjectHolder.gridContainer.gridArray[i] = { key: i, value: value };
+  //     }
+  //   } else if (isFirendly == true) {
+  //     console.log("isfriendly", isFirendly)
+  //   }
+  // }
+
+
   // moveChessPiece(from: any, to: any) {
   //   this.checkValidMove({ key: '', type: 'q', owner: 'white' }, { key: 0, value: '' }) ? this.swapping(from, to) : alert('falsMove');
   // }
@@ -220,3 +331,4 @@ export class DrawingBoardComponent implements OnInit {
   ngOnInit() { }
 
 }
+
