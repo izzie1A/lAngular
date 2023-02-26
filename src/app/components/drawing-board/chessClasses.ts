@@ -81,7 +81,6 @@ export class GridBoard {
             // this.pieceElementSelector = selectElement;
             // this.pieceDataSelector = selectData;
             this.showPossibleMove(this.getChessMovementVector(selectData.value), selectData.key);
-
         }
         else {
             this.hidePossibleMove(this.getChessMovementVector(this.pieceDataSelector.value), this.pieceDataSelector.key);

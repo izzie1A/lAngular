@@ -11,18 +11,13 @@ export class NavBarComponent implements OnInit {
   }
 
   navbarGidContainer = [
-    '',
-    '',
-    '',
+    'home',
+    'firebase',
     'search',
+    '',
   ];
 
-  arrayList = [
-    'search',
-    'home',
-    'settings',
-    'favorite',
-  ];
+
 
 
   drop(event: CdkDragDrop<string[]>) {

@@ -19,6 +19,13 @@ html {
   height: -webkit-fill-available;
   width: -webkit-fill-available;
 }
+.kmaxH {
+  height: -webkit-fill-available;
+}
+.kmaxW {
+  width: -webkit-fill-available;
+}
+
 .hRatioH {
   aspect-ratio: 1/0.69;
 }
@@ -40,6 +47,11 @@ html {
 
 .hPadding {
   padding: 1%;
+}
+.hFlexM {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .gridC {

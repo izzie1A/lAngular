@@ -15,12 +15,21 @@ import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideDatabase, getDatabase } from '@angular/fire/database';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 // style material
-import {DragDropModule} from '@angular/cdk/drag-drop';
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+
 
 //custom component 
 import { DrawingBoardComponent } from 'src/app/components/drawing-board/drawing-board.component';
 import { NavBarComponent } from 'src/app/components/nav-bar/nav-bar.component';
-
+import { TaskComponent } from './components/firebase/task/task.component';
+import { TaskDialogComponent } from './components/firebase/task-dialog/task-dialog.component';
+import { TaskContainerComponent } from './components/firebase/task-container/task-container.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +37,9 @@ import { NavBarComponent } from 'src/app/components/nav-bar/nav-bar.component';
     GoogleMapComponent,
     DrawingBoardComponent,
     NavBarComponent,
+    TaskComponent,
+    TaskDialogComponent,
+    TaskContainerComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,7 +52,14 @@ import { NavBarComponent } from 'src/app/components/nav-bar/nav-bar.component';
     provideDatabase(() => getDatabase()),
     provideFirestore(() => getFirestore()),
     DragDropModule,
-    
+    MatToolbarModule,
+    MatIconModule,
+    MatCardModule,
+    MatDialogModule,
+    MatInputModule,
+    FormsModule
+
+
   ],
   providers: [],
   bootstrap: [AppComponent]

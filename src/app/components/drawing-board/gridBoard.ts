@@ -1,5 +1,21 @@
 import { fromEventPattern } from "rxjs";
+interface hGrid {
+    sizeX: number
+    sizeY: number
+}
+interface Block {
+    pieceValue: any
+    owner: string | undefined;
+}
 
+interface chessPieceInterface {
+    name: any
+    type: string
+    owner?: any
+    health?: any
+    status?: any
+    movement: any
+}
 export class GridMap {
     boardSize = 8;
     gridContainer: any = []
@@ -10,11 +26,6 @@ export class GridMap {
     whitePlayerPiece: any = []
     blackPlayerPiece: any = []
     chessPieceOrderArray = ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r', 'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'];
-
-    selector: any | undefined = undefined;
-    pieceActionArray:any[] = [];
-    // pieceElementSelector: any
-    // pieceDataSelector: any
 
 
     constructor(boardSize: hGrid) {
@@ -27,7 +38,9 @@ export class GridMap {
         this.whitePlayerPiece = this.placeChessOnGrid(this.chessPieceOrderArray, this.gridContainer.gridMap, 0, 1, 'black')
         this.blackPlayerPiece = this.placeChessOnGrid(this.chessPieceOrderArray.reverse(), this.gridContainer.gridMap, 48, 1, 'white')
 
-        this.tPrintGrid();
+        let x: ChessPiece = new ChessPiece();
+        console.log(x);
+
     }
 
     // initialize
@@ -57,30 +70,15 @@ export class GridMap {
     placeChessOnGrid(targetChessArray: string[], targetGrid: any, from: any, direction: number, owner?: string) {
         for (let i = 0; i < targetChessArray.length; i = i + 1) {
             // targetGrid.set((i + (from * direction)).toString(), [targetChessArray[i]]);
-            targetGrid.set((i + (from * direction)).toString(), { pieceValue: targetChessArray[i], owner: owner });
+            // targetGrid.set((i + (from * direction)).toString(), { pieceValue: targetChessArray[i], owner: owner });
+            let x: Block = { pieceValue: targetChessArray[i], owner: owner };
+            targetGrid.set((i + (from * direction)).toString(), x);
         }
         return targetGrid
     }
 
 
     // control
-
-    action(fromSelector: any, toSelector: any) {
-        let holder = fromSelector;
-        let isFirendly = this.isFriendly(fromSelector, toSelector);
-
-        if (isFirendly == false) {
-            //attack 
-            console.log('attack', )
-            this.gridContainer.gridMap.set(fromSelector.selectData.key.toString(), { pieceValue: 'e', owner: '' });
-            this.gridContainer.gridMap.set(toSelector.selectData.key.toString(), { pieceValue: holder.selectData.value.pieceValue, owner: holder.selectData.value.owner });
-        } else if (isFirendly == true) {
-        }
-    }
-
-    isFriendly(fromSelector: any, toSelector: any) {
-        return fromSelector.selectData.value.owner == toSelector.selectData.value.owner;
-    }
 
     getPieceMoves(inputString: string, pieceData: any) {
         let trssformer: any = 0;
@@ -126,39 +124,37 @@ export class GridMap {
         // this.gridContainer.gridMap.get(fromSelector.selectData.key.toString());
 
         let inRange = false;
-        for( let loopItem of ValiMoveArray){
+        for (let loopItem of ValiMoveArray) {
             // console.log(loopItem+fromSelector.selectData.key == toSelector.selectData.key);
             // console.log('loopItem+',);
             // console.log('loopItem',loopItem,'key',toSelector.selectData.key);
-            if(loopItem+fromSelector.selectData.key == toSelector.selectData.key){
+            if (loopItem + fromSelector.selectData.key == toSelector.selectData.key) {
                 inRange = true
                 break;
             }
         }
-        
+
         // console.log('inRange',inRange,'attackable',attackable);
-        inRange!! && attackable!! ? this.pieceMoveTo(fromSelector,toSelector, attackable):console.warn('invalidMove');
-        return inRange ? attackable : inRange
+        // inRange!! && attackable!! ? this.pieceMoveTo(fromSelector,toSelector, attackable):console.warn('invalidMove');
+        return inRange&&attackable ? true : false
     }
 
-    pieceMoveTo(fromSelector: any, toSelector: any, isValid:boolean){
-            // change map&array
-            this.gridContainer.gridMap.set(fromSelector.selectData.key.toString(), { pieceValue: 'e', owner: '' });
-            this.gridContainer.gridMap.set(toSelector.selectData.key.toString(), { pieceValue: fromSelector.selectData.value.pieceValue, owner: fromSelector.selectData.value.owner });
-            for (const [key, value] of this.gridContainer.gridMap) {
-                let i = parseInt(key, 10);
-                this.gridContainer.gridArray[i] = { key: i, value: value };
-            }
-            this.pieceActionQuery({fromSelector:fromSelector,toSelector:toSelector})
+    pieceMoveTo(fromSelector: any, toSelector: any) {
+        // change map&array
+        this.gridContainer.gridMap.set(fromSelector.selectData.key.toString(), { pieceValue: 'e', owner: '' });
+        this.gridContainer.gridMap.set(toSelector.selectData.key.toString(), { pieceValue: fromSelector.selectData.value.pieceValue, owner: fromSelector.selectData.value.owner });
+
+        for (const [key, value] of this.gridContainer.gridMap) {
+            let i = parseInt(key, 10);
+            this.gridContainer.gridArray[i] = { key: i, value: value };
+        }
     }
 
-    pieceActionQuery(input:any){
-        this.pieceActionArray[this.pieceActionArray.length]=input;
-        console.log(this.pieceActionArray)
-    }
+}
 
 
-export class ChessPiece implements rtChessPiece {
+
+export class ChessPiece implements chessPieceInterface {
     name: any;
     type: any;
     owner = 'none';
@@ -232,7 +228,6 @@ export class ChessPiece implements rtChessPiece {
         }
         return outputArr
     }
-
     get2DCoordinate(gridLength: number, position: number) {
         return { x: (position % gridLength), y: Math.floor((position / gridLength)) }
     }
@@ -309,7 +304,6 @@ export class Pawn extends ChessPiece {
 }
 
 // mass
-
 export class King extends ChessPiece {
     rookSwapAvailable = false;
     checkmate = false;
@@ -374,7 +368,6 @@ export class Rook extends ChessPiece {
 export class Knight extends ChessPiece {
     rookSwapAvailable = false;
     checkmate = false;
-
     setMovement() {
         var outputArr: number[] = new Array()
         for (let i = 1; i < 2; i++) {
@@ -395,3 +388,4 @@ export class Knight extends ChessPiece {
     }
 
 }
+

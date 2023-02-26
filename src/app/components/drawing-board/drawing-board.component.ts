@@ -20,7 +20,8 @@ export class DrawingBoardComponent implements OnInit {
   interval: any;
 
   // action
-  commandArray:any[] =[]
+  pieceActionArray: any[] = []
+  testArray: any[] = []
 
   // displayArray : any[];
   displayArray: {
@@ -40,6 +41,9 @@ export class DrawingBoardComponent implements OnInit {
     // let testY: GridBoard = new GridBoard({ sizeX: this.boardSize, sizeY: this.boardSize });
     this.gridArray = this.gridBoardInjectHolder.getMapToArray(this.gridBoardInjectHolder.gridContainer.gridMap, this.gridBoardInjectHolder.gridContainer.gridArray);
     this.startTimer()
+    this.testT();
+    this.testArray = []
+
   }
 
 
@@ -49,11 +53,12 @@ export class DrawingBoardComponent implements OnInit {
       console.log('select', selectElement, selectData)
       this.selector = { element: selectElement, selectData: selectData }
       let availableMoveHolder = this.gridBoardInjectHolder.getPieceMoves(selectData.value.pieceValue, selectData);
+
       this.loadAvailableMoves(availableMoveHolder, selectData.key)
       this.showPossibleMove(true, this.displayArray.availableMovesArray);
     }
     else if (this.selector != undefined) {
-      if (this.selector.element == selectElement && this.selector.selectData == selectData) {
+      if (this.selector.element == selectElement && this.selector.selectData == selectData && this.selector.selectData.pieceValue != "") {
         console.log('deselect', this.selector.element == selectElement && this.selector.selectData == selectData)
         this.selector = undefined;
         this.showPossibleMove(false, this.displayArray.availableMovesArray);
@@ -62,6 +67,13 @@ export class DrawingBoardComponent implements OnInit {
       } else {
         console.log('active')
         let result = this.gridBoardInjectHolder.checkValidMove(this.selector, { element: selectElement, selectData: selectData });
+        console.log(result);
+
+        // this.gridBoardInjectHolder.pieceMoveTo(this.selector, { element: selectElement, selectData: selectData });
+
+        result ? this.gridBoardInjectHolder.pieceMoveTo(this.selector, { element: selectElement, selectData: selectData }) : console.warn('invalidMove');
+        result ? this.move(this.selector, { element: selectElement, selectData: selectData }) : 0;
+        // this.testF(this.selector, { element: selectElement, selectData: selectData });
         this.showPossibleMove(false, this.displayArray.availableMovesArray);
         this.selector = undefined;
       }
@@ -86,31 +98,67 @@ export class DrawingBoardComponent implements OnInit {
     }
   }
 
+  testF(selectElement: any, selectData: any) {
+    this.gridBoardInjectHolder.pieceMoveTo(this.selector, { element: selectElement, selectData: selectData });
+  }
+
+  testT() {
+    let x = setInterval(() => {
+    }, 1000)
+  }
+
+  async move(from: any, to: any) {
+    // const elementArray = document.getElementsByClassName("myBar");
+    // const element = document.getElementById(from.element.id);
+    const element = await document.getElementById("myBar");
+    this.testArray[this.testArray.length] = this.testArray.length
+    let progress = 1;
+
+    console.log(from.selectData.key + "to" + to.selectData.key)
+    console.log(this.testArray)
+    console.log(from)
+
+    let moveCommand = {
+      id: from.selectData.key + "to" + to.selectData.key,
+      from: from.selectData.key,
+      to: to.selectData.key,
+      startTime: this.timeLeft,
+    }
+    console.log(moveCommand)
+    this.testArray[this.testArray.length - 1] = moveCommand
+
+    const id = setInterval(frame, 10);
+    function frame() {
+      if (progress == 100) {
+        element! ? element.style.width = 0 + '%' : 0;
+        clearInterval(id);
+      } else {
+        progress++;
+        element! ? element.style.width = progress + '%' : 0;
+      }
+    }
+  }
+
 
   startTimer() {
     this.interval = setInterval(() => {
-      this.commandArray = this.gridBoardInjectHolder.pieceActionArray
-      if (this.timeLeft > 0) {
+      this.pieceActionArray = this.gridBoardInjectHolder.pieceActionArray
+      if (this.timeLeft % 10 != 0) {
         let tAns: HTMLElement | null = document.getElementById('timer');
         let ratio = 255;
-        let colorHex = (ratio*this.timeLeft).toString(16);
-        colorHex = (ratio*this.timeLeft).toString(16);
-        console.log(colorHex) 
-        tAns?.setAttribute("style", "background-color : #"+colorHex+"; border: 1px solid blue;");
-        this.timeLeft--;
-
+        let colorHex = (ratio * this.timeLeft).toString(16);
+        colorHex = (ratio * this.timeLeft).toString(16);
+        tAns?.setAttribute("style", "background-color : #" + colorHex + "; border: 1px solid blue;");
+        this.timeLeft++;
       } else {
-        this.timeLeft = 10 ;
+        this.timeLeft = this.timeLeft + 1;
+        console.log(this.pieceActionArray)
       }
-
-      if(this.timeLeft == 1){
-        console.log(this.commandArray)
-        this.commandArray.splice(this.commandArray.length-1,1);
-        console.log(this.commandArray)
-      }else{
-        console.log(this.timeLeft%10)
+      if (this.timeLeft == 1) {
+        // this.commandArray.splice(this.commandArray.length-1,1);
+      } else {
       }
-    }, 1000)
+    }, 10000)
   }
 
   pauseTimer() {
@@ -121,19 +169,6 @@ export class DrawingBoardComponent implements OnInit {
     let y = '#0000FF';
     let z = '#00FF00';
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -1,78 +1,76 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 
-    <div class="mapPannel " cdkDrag>
-      <div class="mapPannelFirstChild" (click)="expanNavbar()" >
-        <span class="material-symbols-outlined">menu</span>
-      </div>
-      <div class="mapPannelList" [style.height]="navHeight" cdkDragHandle>
-        <div cdkDropList class="gridCR kmax">
-          <div class="" *ngFor="let movie of navbarGidContainer" >
-            <div class="mapPannelChild">
-              <span class="material-symbols-outlined">{{movie}}</span>
-              <div>{{movie}}</div>
-            </div>
-          </div>
+<div class="mapPannel " cdkDrag>
+  <div class="mapPannelFirstChild" cdkDragHandle (click)="expanNavbar()">
+    <span class="material-symbols-outlined">menu</span>
+  </div>
+  <div class="mapPannelList" [style.height]="navHeight">
+    <div cdkDropList class="t kmax">
+      <div class="" *ngFor="let movie of navbarGidContainer">
+        <div class="mapPannelChild" routerLink="/{{movie.toString()}}" href="#" id="setting" class="nav__link">
+          <span class="material-symbols-outlined">{{movie}}</span>
+          <div>{{movie}}</div>
         </div>
       </div>
     </div>
+  </div>
 
 
 
-<style>
+  <style>
+    .mapViewer {
+      width: 100vw;
+      height: 100vh;
+    }
 
-  .mapViewer {
-    width: 100vw;
-    height: 100vh;
-  }
+    .mapPannel {
+      width: 10vw;
+      position: absolute;
+      top: 5vh;
+      left: 5vw;
+      background-color: #fff;
+      z-index: 1;
+      border-radius: 1.5vmax;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 2px 2px 2px 2px;
+      overflow: hidden;
+      /* content */
+      /* shadow */
+      box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+      animation-duration: 1.5s;
+    }
 
-  .mapPannel {
-    width: 10vw;
-    position: absolute;
-    top: 5vh;
-    left: 5vw;
-    background-color: #fff;
-    z-index: 1;
-    border-radius: 1.5vmax;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 2px 2px 2px 2px;
-    overflow: hidden;
-    /* content */
-    /* shadow */
-    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
-    animation-duration: 1.5s;
-  }
+    .t:active {
+      box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+        0 8px 10px 1px rgba(0, 0, 0, 0.14),
+        0 3px 14px 2px rgba(0, 0, 0, 0.12);
+    }
 
-  .mapPannel:active {
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-      0 8px 10px 1px rgba(0, 0, 0, 0.14),
-      0 3px 14px 2px rgba(0, 0, 0, 0.12);
-  }
+    .mapPannelList {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: auto;
+      /* animation */
+      transition: all 0.5s cubic-bezier(0, 0, .5, 1);
+      transition-timing-function: cubic-bezier(0, 0, 0.5, 1);
+      transition-delay: 0s;
+      transition-property: all;
+    }
 
-  .mapPannelList {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    width: auto;
-    /* animation */
-    transition: all 0.5s cubic-bezier(0, 0, .5, 1);
-    transition-timing-function: cubic-bezier(0, 0, 0.5, 1);
-    transition-delay: 0s;
-    transition-property: all;
-  }
+    .mapPannelChild {
+      padding: 2.5%;
+      display: flex;
+      box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 
-  .mapPannelChild {
-    padding: 2.5%;
-    display: flex;
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    }
 
-  }
-
-  .mapPannelFirstChild {
-    padding: 10%;
-    background-color: #D9D9D9;
-    height: 20px;
-    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
-  }
-</style>
+    .mapPannelFirstChild {
+      padding: 10%;
+      background-color: #D9D9D9;
+      height: 20px;
+      box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    }
+  </style>
